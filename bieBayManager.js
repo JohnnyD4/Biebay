@@ -6,6 +6,8 @@ var items = [];
 
 var itemUpdated;
 
+var addInventory;
+
 var connection = mysql.createConnection({
 	
 	host: 'localhost',
@@ -108,15 +110,24 @@ function runManager() {
 								{
 									type: 'input',
 									message: 'Add amount of inventory being added',
-									name: ''
+									name: 'invUpdate'
 								}
-							])
-						connection.query("UPDATE `products` SET `stock_quantity` WHERE `product_name` = ?", [itemUpdated], function(err, data) {
+							]).then(function(response) {
+								connection.query("SELECT `stock_quantity` FROM `products` WHERE `product_name` = ?",[itemUpdated], function(err, data) {
 
-							if (err) throw err;
+									if (err) throw err;
 
-							console.log("Updated stock inventory.");
-						})
+									addedInventory = parseInt(data[0].stock_quantity) + parseInt(response.invUpdate);
+
+									connection.query("UPDATE `products` SET `stock_quantity` = ? WHERE `product_name` = ?", [add, itemUpdated], function(err, data) {
+
+										if (err) throw err;
+
+										console.log("Updated stock inventory.");
+									})
+								})
+							})
+						
 					
 					})
 				
