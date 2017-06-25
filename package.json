@@ -1,0 +1,23 @@
+{
+  "name": "biebay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bieBayCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohnnyD4/Biebay.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JohnnyD4/Biebay/issues"
+  },
+  "homepage": "https://github.com/JohnnyD4/Biebay#readme",
+  "dependencies": {
+    "inquirer": "^3.1.1",
+    "mysql": "^2.13.0"
+  }
+}
