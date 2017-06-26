@@ -32,14 +32,23 @@ connection.connect(function(err) {
 
 	function initialPrompt() {
 
-		connection.query("SELECT `item_id`, `product_name`, `price` FROM `products`", function(err, data) {
+		connection.query("SELECT `item_id`, `product_name`, `price`, `autographed` FROM `products`", function(err, data) {
 
 			if (err) throw err;
 
 			for (var i = 0; i < data.length; i++) {
 				itemList.push(data[i]);
 
-				console.log("id", itemList[i].item_id + ":", itemList[i].product_name, "$" + itemList[i].price);
+				if(itemList[i].autographed === 1) {
+					
+					console.log("id", itemList[i].item_id + ":", "Autographed", itemList[i].product_name, "$" + itemList[i].price);
+	
+				} else {
+
+					console.log("id", itemList[i].item_id + ":", itemList[i].product_name, "$" + itemList[i].price);
+				
+				}
+
 
 			}
 

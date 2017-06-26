@@ -22,65 +22,83 @@ connection.connect(function(err) {
 
 	runManager();
 
-function runManager() {
-	inquirer.prompt([
-			{
-				type: 'list',
-				message: 'Choose a selection',
-				name: 'managerChoice',
-				choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product']
-			}
-		]).then (function(response) {
-			switch (response.managerChoice) {
-				case 'View Products for Sale': 
-					viewProducts();
-					break;
+		function runManager() {
+			inquirer.prompt([
+					{
+						type: 'list',
+						message: 'Choose a selection',
+						name: 'managerChoice',
+						choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product']
+					}
+				]).then (function(response) {
+					switch (response.managerChoice) {
+						case 'View Products for Sale': 
+							viewProducts();
+							break;
 
-				case 'View Low Inventory':
-					viewLow();
-					break;
+						case 'View Low Inventory':
+							viewLow();
+							break;
 
-				case 'Add to Inventory':
-					addInventory();
-					break;
+						case 'Add to Inventory':
+							addInventory();
+							break;
 
-				case 'Add New Product':
-					addNewProduct();
-					break;
+						case 'Add New Product':
+							addNewProduct();
+							break;
 
-				default: 
-					console.log("Invalid Choice");
+						default: 
+							console.log("Invalid Choice");
 
 
-			}
-		})
-}	
+					}
+				})
+		}	
 
 		function viewProducts() {
 			
-			connection.query("SELECT `item_id`, `product_name`, `price`, `stock_quantity` FROM `products`", function(err, data) {
+			connection.query("SELECT `item_id`, `product_name`, `price`, `stock_quantity`, `autographed` FROM `products`", function(err, data) {
 				
 				if (err) throw err;
 
 				for (var i = 0; i < data.length; i++) {
 					
-					console.log("ID:",  data[i].item_id, "PRODUCT:", data[i].product_name, "PRICE: $" + data[i].price, "STOCK QUANTITY:", data[i].stock_quantity);
+					if(data[i].autographed === 1) {
+					
+						console.log("ID:",  data[i].item_id, "PRODUCT:", "Autographed", data[i].product_name, "PRICE: $" + data[i].price, "STOCK QUANTITY:", data[i].stock_quantity);
+
+					} else {
+
+						console.log("ID:",  data[i].item_id, "PRODUCT:", data[i].product_name, "PRICE: $" + data[i].price, "STOCK QUANTITY:", data[i].stock_quantity);
+
+					}
 				}
 				
+				runPrompt();
 			})
 		}
 
 		function viewLow() {
 			
-			connection.query("SELECT `item_id`, `product_name`, `price`, `stock_quantity` FROM `products` WHERE `stock_quantity` < 12", function(err, data) {
+			connection.query("SELECT `item_id`, `product_name`, `price`, `stock_quantity`, `autographed` FROM `products` WHERE `stock_quantity` < 12", function(err, data) {
 
 				if (err) throw err;
 
 				for (var i = 0; i < data.length; i++) {
 
-					console.log("ID:",  data[i].item_id, "PRODUCT:", data[i].product_name, "PRICE: $" + data[i].price, "STOCK QUANTITY:", data[i].stock_quantity);
+					if(data[i].autographed === 1) {
+					
+						console.log("ID:",  data[i].item_id, "PRODUCT:", "Autographed", data[i].product_name, "PRICE: $" + data[i].price, "STOCK QUANTITY:", data[i].stock_quantity);
 
+					} else {
+
+						console.log("ID:",  data[i].item_id, "PRODUCT:", data[i].product_name, "PRICE: $" + data[i].price, "STOCK QUANTITY:", data[i].stock_quantity);
+
+					}
 				}
+
+				runPrompt();
 			})	
 		}
 
@@ -117,13 +135,15 @@ function runManager() {
 
 									if (err) throw err;
 
-									addedInventory = parseInt(data[0].stock_quantity) + parseInt(response.invUpdate);
-
-									connection.query("UPDATE `products` SET `stock_quantity` = ? WHERE `product_name` = ?", [add, itemUpdated], function(err, data) {
+									addedInventory = Number(data[0].stock_quantity) + Number(response.invUpdate);
+									
+									connection.query("UPDATE `products` SET `stock_quantity` = ? WHERE `product_name` = ?", [addedInventory, itemUpdated], function(err, data) {
 
 										if (err) throw err;
 
 										console.log("Updated stock inventory.");
+
+										runPrompt();
 									})
 								})
 							})
@@ -175,10 +195,34 @@ function runManager() {
 						if (err) throw err;
 
 						console.log("Updated Database");
+
+						runPrompt();
 					})
+
+					
 				})
 				
 		}
 
+		function runPrompt() {
+			inquirer.prompt([
+					{
+						type: 'list',
+						message: 'Run another task?',
+						name: 'run',
+						choices: ['Yes', 'No']
+					}
+				]).then (function(response) {
+					
+					if (response.run === 'Yes') {
+					
+						runManager();
+					
+					} else {
+
+						console.log('Finished.');
+					}
+				})
+		}
 
 })
